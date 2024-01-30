@@ -1,0 +1,194 @@
+---
+title: "BarcelonaAccidents"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BarcelonaAccidents}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+# Introduction
+
+Accidents are complex events, often influenced by a diverse range of factors such as location, time, weather conditions, and demographic attributes. The `AccidentAnalysis` package is designed to bridge the gap between raw data and insightful analysis. By seamlessly transforming intricate datasets into intuitive visual representations, this package empowers users to uncover significant patterns and trends. When a dataset is visualized using the package one can understand where the peak points are and concentrate on clearing them.
+
+# Motivation
+The package is aimed to find the causes and results of the accidents. By identifying these , one can understand the patterns to find the root cause and eliminate it to bring a better and safe society.
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(Accidentanalysis)
+```
+
+# Dataset Used
+The dataset used in the package is the Barcelona accidents dataset that is taken for the years 2017 to 2021. The dataset is chose because it is an easy example dataset that can be easiy explained and visualised.
+
+## Loading the dataset
+
+
+```{r}
+#Load the dataset
+ accidents <- load_accident_dataset()
+```
+
+
+### Displaying the first few records of the sample dataset
+  
+
+
+```{r}
+# Display the first few rows of the dataset 
+ head(accidents) 
+ # Summary statistics of the dataset 
+ summary(accidents)
+```
+
+
+
+## Severity Analysis
+The concept of severity analysis takes into consideration the injuries of both types mild and severe and calculates the accidents that are highly occured in each of the district.
+
+Perform a severity analysis and visualize the results using the `severity_analysis_plot` function:
+
+```{r}
+severity_analysis_plot <- function(data) {
+  library(ggplot2)
+
+  # Perform severity analysis (example calculation)
+  severity_summary <- aggregate(
+    cbind(Mild = `Mild injuries`, Serious = `Serious injuries`) ~ `District Name`,
+    data = data,
+    FUN = sum
+  )
+
+  # Plot severity analysis
+  ggplot(severity_summary, aes(x = `District Name`, y = Mild + Serious, fill = `District Name`)) +
+    geom_bar(stat = "identity") +
+    labs(title = "Severity Analysis by District", x = "District Name", y = "Total Injuries") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(plot.margin = margin(10, 10, 20, 10, "pt")) +
+    theme(legend.position = "none") +
+    theme(panel.grid.major.x = element_blank()) +
+    theme(panel.grid.minor.x = element_blank())
+}
+
+```
+
+
+```{r severity-analysis,fig.width=8, fig.height=5}
+library(dplyr)
+severity_analysis_plot(accidents)
+
+```
+
+## Hourly Accident Distribution
+These indicate the hour timings in which the accidents number raise to a peak. The traffic arrangements can be enhancement and route directions can be altered.
+
+Visualize the distribution of accidents by hour of the day using the `plot_hourly_distribution` function:
+
+```{r}
+plot_hourly_distribution <- function(data) {
+  library(ggplot2)
+
+  ggplot(data, aes(x = Hour)) +
+    geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
+    labs(title = "Hourly Accident Distribution", x = "Hour of the Day", y = "Frequency") +
+    theme_minimal()
+}
+
+```
+
+
+```{r hourly-distribution, fig.width=8, fig.height=5}
+accidents <- load_accident_dataset()
+plot_hourly_distribution(accidents)
+```
+
+## Vehicle Involvement Analysis
+The number of vehicles restriction can be placed into account using this analysis. The control of flow of vehicles can use this to enhance their performance.
+Analyze the impact of the number of vehicles involved in accidents on severity using the `vehicle_involvement_analysis` function:
+
+```{r}
+vehicle_involvement_analysis <- function(data) {
+  result <- data %>%
+    group_by(`Vehicles involved`) %>%
+    summarise(
+      Avg_Mild = mean(`Mild injuries`),
+      Avg_Serious = mean(`Serious injuries`),
+      Total_Injuries = sum(`Mild injuries` + `Serious injuries`)
+    )
+
+  # Plot the results
+  plot <- ggplot(result, aes(x = `Vehicles involved`, y = Total_Injuries, fill = `Vehicles involved`)) +
+    geom_bar(stat = "identity") +
+    labs(title = "Vehicle Involvement Analysis", x = "Number of Vehicles Involved", y = "Total Injuries") +
+    theme_minimal()
+
+  return(list(summary = result, plot = plot))
+}
+```
+
+
+```{r}
+library(magrittr)
+library(dplyr)
+vehicle_analysis_result <- vehicle_involvement_analysis(accidents)
+vehicle_analysis_result$summary
+
+```
+
+```{r vehicle-involvement, fig.width=8, fig.height=5}
+print(vehicle_analysis_result$plot)
+
+```
+
+## Day of the Week Analysis
+These help us identify the weekdays and weekends variations. The regulations and information to the society can help them be aware of the patterns and incidents.
+Analyze the distribution of accidents across different days of the week using the `day_of_week_analysis` function:
+
+```{r}
+day_of_week_analysis <- function(data) {
+  result <- data %>%
+    group_by(Weekday) %>%
+    summarise(AccidentCount = n())
+
+  # Plot the results using a scatter plot
+  plot <- ggplot(result, aes(x = reorder(Weekday, -AccidentCount), y = AccidentCount, color = Weekday)) +
+    geom_point(size = 4) +
+    labs(title = "Day of the Week Analysis", x = "Day of the Week", y = "Accident Count") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  return(list(summary = result, plot = plot))
+}
+
+```
+
+
+```{r}
+#Statistical Analysis of the result
+day_of_week_result <- day_of_week_analysis(accidents)
+day_of_week_result$summary
+
+```
+
+```{r day-of-week, fig.width=8, fig.height=5}
+#The plot that shows the accidents trend over the days of a week
+print(day_of_week_result$plot)
+
+```
+
+## Warnings
+
+There are a few warnings when run the check file. The first warning is related to the usage og packages, that is the way it is used. Instead of using library(package), the warning suggests to use package :: .
+The other one is the version specification. The clear idea of the version to use is not specified in the description file.
+The final warning is the latex, pdf generation warning.
+
+
