@@ -7,7 +7,7 @@ Data Loading:
 
 I loaded data for Nitrogen Dioxide (NO2), Ozone (O3), and Nitrogen Monoxide (NO) for each year.
 Used the sf package to play around with spatial data.
-Plotted the chosen air quality station on the Berlin map – felt pretty cool doing that.
+Plotted the chosen air quality station on the Berlin map.
 
 Time Series Plots:
 
@@ -19,7 +19,7 @@ Correlation Matrix:
 Calculated a correlation matrix to see if these pollutants are buddies or not.
 Visualized it as a heatmap using a pretty color gradient for visualization using ggplot2.
 
-This code is like my playground for understanding how air quality fluctuates in Berlin. It's me experimenting out trends and connections between different pollutants. 
+This code is for understanding how air quality fluctuates in Berlin. It's me experimenting out trends and connections between different pollutants. 
 
 ## The Accident Analysis Package
 I created this beginner R package called "Accidentanalysis." As a student, I was all about experimenting with data analysis, and a brief note on the package is that it contains five different in-built functions that can be used in the package.
